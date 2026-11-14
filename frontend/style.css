@@ -21,7 +21,6 @@ body {
     max-width: 800px;
     background-color: #ffffff;
     display: flex;
-    /* Stack header, chat-box, and input-area neatly from top to bottom */
     flex-direction: column;
     height: 100vh;
     border-left: 1px solid #e2e8f0;
@@ -63,6 +62,8 @@ body {
     border-radius: 8px;
     line-height: 1.5;
     font-size: 0.95rem;
+    /* Why: Preserves paragraphs and line breaks sent by the AI so text isn't squished */
+    white-space: pre-wrap;
 }
 
 /* AI messages go on the left with a soft light-gray background */
