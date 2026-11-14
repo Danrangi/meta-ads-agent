@@ -1,0 +1,8 @@
+# FastAPI helps us build the API that our frontend will talk to
+fastapi==0.115.0
+
+# Uvicorn is the web server engine that runs our FastAPI code
+uvicorn==0.30.6
+
+# python-dotenv lets us hide our secret AI API keys in a .env file
+python-dotenv==1.0.1
