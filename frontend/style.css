@@ -1,0 +1,124 @@
+/* Remove default spacing added by browsers so we have full control over the layout */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Set a clean, light-gray background and an easy-to-read professional font */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f7f9fc;
+    color: #1e293b;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Keep the chat app centered and readable on wide monitors, but full-width on phones */
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #ffffff;
+    display: flex;
+    /* Stack header, chat-box, and input-area neatly from top to bottom */
+    flex-direction: column;
+    height: 100vh;
+    border-left: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+}
+
+/* Style the top header */
+.app-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
+}
+
+.app-header h1 {
+    font-size: 1.25rem;
+    color: #0f172a;
+}
+
+.app-header p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Make the chat area take up all available middle space and allow scrolling */
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Basic style for all chat bubbles */
+.message {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* AI messages go on the left with a soft light-gray background */
+.ai-message {
+    align-self: flex-start;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+}
+
+/* Your messages go on the right with a Meta-blue background */
+.user-message {
+    align-self: flex-end;
+    background-color: #1877f2;
+    color: #ffffff;
+}
+
+/* Style the bottom typing area */
+.input-area {
+    padding: 16px 20px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+    background-color: #ffffff;
+}
+
+/* Make the text box fill the width and look clean */
+#user-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: none;
+}
+
+/* Highlight the text box border when you click inside to type */
+#user-input:focus {
+    outline: none;
+    border-color: #1877f2;
+}
+
+/* Style the Send button */
+#send-btn {
+    background-color: #1877f2;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Slightly darken the button when hovering over it with a mouse */
+#send-btn:hover {
+    background-color: #166fe5;
+}

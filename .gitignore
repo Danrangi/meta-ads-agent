@@ -1,0 +1,15 @@
+﻿# Ignore the .env file because it will hold our secret AI API keys
+.env
+
+# Ignore Python virtual environment folders (these are large tools installed on the computer, not our own code)
+venv/
+.venv/
+env/
+
+# Ignore temporary cache files that Python creates automatically when running
+__pycache__/
+*.pyc
+
+# Ignore system files created automatically by Mac or Windows
+.DS_Store
+Thumbs.db

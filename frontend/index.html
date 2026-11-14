@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- This line makes sure the website looks good and scales properly on mobile phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Ads AI Mentor</title>
+    <!-- Connect our CSS file so the page has clean styling -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main container that keeps the chat centered on big computer screens -->
+    <div class="app-container">
+        
+        <!-- Simple header so we know what tool we are using -->
+        <header class="app-header">
+            <h1>Meta Ads AI Mentor</h1>
+            <p>Strategy, Copywriting, Targeting & Learning</p>
+        </header>
+
+        <!-- This box holds the conversation history so you can scroll up and read past advice -->
+        <main id="chat-box" class="chat-box">
+            <!-- A welcome message from the AI so the screen isn't blank when you open it -->
+            <div class="message ai-message">
+                Hello! I am your Meta Ads AI Mentor. Tell me about the product or service you want to advertise today, and I will help you build a strategy and teach you along the way.
+            </div>
+        </main>
+
+        <!-- The bottom area where you type your question and click Send -->
+        <footer class="input-area">
+            <textarea 
+                id="user-input" 
+                placeholder="Ask about ad strategy, targeting, or ad copy..." 
+                rows="2"
+            ></textarea>
+            <button id="send-btn">Send</button>
+        </footer>
+
+    </div>
+
+    <!-- Connect our JavaScript file at the bottom so the HTML loads first before the code runs -->
+    <script src="app.js"></script>
+</body>
+</html>
