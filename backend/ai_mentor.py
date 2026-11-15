@@ -1,89 +1,147 @@
 import os
+import requests
 from dotenv import load_dotenv
 from groq import Groq
 
-# 1. Load the secret API key from our .env file into Python's memory
+from backend.knowledge_loader import load_expert_knowledge
+
+# 1. Load secret API keys from .env
 load_dotenv()
 
-# 2. Define the AI's personality and teaching rules (The System Prompt)
-SYSTEM_PROMPT = """
+# 2. Define the core instructions for our Nigerian & Global Meta Ads Mentor
+BASE_SYSTEM_PROMPT = """
 You are my personal Meta Ads (Facebook & Instagram) AI Strategist and Mentor.
-I took a Meta Ads course, so I know the basics, but I am not an expert yet.
+I am based in Nigeria and running Meta Ads primarily for the Nigerian market (unless I state otherwise).
+I took a Meta Ads course, so I know the basics, but I want expert guidance.
 
 Whenever you help me with ad strategy, ad copy, targeting, or campaign analysis, you MUST follow these rules:
-1. Give practical, actionable Meta Ads advice I can use right away.
-2. Keep your answers clear, structured, and easy to read.
-3. Always include a short section at the end called "💡 Why This Works (Lesson):" where you explain the Meta Ads principle behind your advice in simple English so I learn while working.
+1. Strictly follow the rules in the EXPERT META ADS KNOWLEDGE BASE below.
+2. Tailor your advice to the Nigerian market (use Naira ₦ for budgets/offers, consider WhatsApp/IG DM funnels, Lagos/Abuja/PH targeting, and Nigerian buyer trust) unless I specify a foreign country.
+3. NEVER repeat yourself or invent extra campaigns (#2, #3, #4) that I did not ask about. Answer ONLY what I asked clearly and concisely.
+4. STRICT FORMATTING RULE: Never use Markdown tables (|---|), never use HTML tags like <br>, and never use code blocks (```). Use clean paragraphs, bullet points, and **bold text** for headings.
+5. Always include a short section at the end called "**💡 Why This Works (Lesson):**" explaining the Meta Ads principle behind your advice in simple English.
 """
 
 
-# 3. Function to initialize and return the Groq client
-def get_groq_client():
+# 3. Combine the base instructions with all files inside backend/knowledge/
+def build_full_system_prompt() -> str:
+    expert_notes = load_expert_knowledge()
+    
+    if not expert_notes:
+        return BASE_SYSTEM_PROMPT
+
+    return (
+        f"{BASE_SYSTEM_PROMPT}\n\n"
+        f"=== EXPERT META ADS KNOWLEDGE BASE ===\n"
+        f"{expert_notes}\n"
+        f"======================================"
+    )
+
+
+# 4. Option A: Ask Google Gemini (Free Tier)
+# Why Gemini first? Gemini 2.5 Flash is free, smart, never gets stuck in repetition loops,
+# and has a massive memory for reading long YouTube video transcripts!
+def ask_gemini(system_prompt: str, user_question: str, chat_history: list) -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "PASTE_YOUR_GEMINI_KEY_HERE":
+        return ""  # Return empty so our code knows to use Groq instead
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+
+    # Format the conversation history the way Google Gemini expects it
+    contents = []
+    for msg in chat_history:
+        role_name = "user" if msg["role"] == "user" else "model"
+        contents.append({
+            "role": role_name,
+            "parts": [{"text": msg["content"]}]
+        })
+
+    # Add the user's newest question
+    contents.append({
+        "role": "user",
+        "parts": [{"text": user_question}]
+    })
+
+    payload = {
+        "systemInstruction": {
+            "parts": [{"text": system_prompt}]
+        },
+        "contents": contents,
+        "generationConfig": {
+            "temperature": 0.6
+        }
+    }
+
+    response = requests.post(url, json=payload, timeout=30)
+    if response.status_code == 200:
+        data = response.json()
+        return data["candidates"][0]["content"]["parts"][0]["text"]
+    
+    # If Gemini had an error, return empty so Groq can handle the request as backup
+    return ""
+
+
+# 5. Option B: Ask Groq (Free Tier Backup with Anti-Repetition Fix)
+def ask_groq(system_prompt: str, user_question: str, chat_history: list) -> str:
     api_key = os.getenv("GROQ_API_KEY")
-    
     if not api_key or api_key == "PASTE_YOUR_GROQ_KEY_HERE":
-        raise ValueError("Missing GROQ_API_KEY! Please check your .env file.")
-        
-    return Groq(api_key=api_key)
+        raise ValueError("Missing API Key! Please check your .env file.")
 
+    client = Groq(api_key=api_key)
 
-# 4. Function to find a working AI model on your Groq account
-# Why: AI companies rename or retire models often. Instead of hardcoding just one name
-# that might break, we ask Groq which models are active on your account and pick the best one.
-def get_working_model(client) -> str:
-    # Ask Groq for the list of models your API key has access to
+    # Find the smartest working model on your Groq account
     models_response = client.models.list()
-    
-    # Put all available model IDs into a simple Python list
-    available_models = []
-    for model in models_response.data:
-        available_models.append(model.id)
+    available_models = [m.id for m in models_response.data]
 
-    # Our favorite free models in order of preference
     preferred_models = [
         "llama-3.3-70b-versatile",
+        "deepseek-r1-distill-llama-70b",
+        "qwen-qwq-32b",
+        "gemma2-9b-it",
         "llama-3.1-8b-instant",
         "llama3-70b-8192",
-        "llama3-8b-8192",
-        "gemma2-9b-it",
-        "mixtral-8x7b-32768"
+        "llama3-8b-8192"
     ]
 
-    # Check our favorites one by one. Return the first one that is available!
+    chosen_model = "llama-3.1-8b-instant"
     for model_name in preferred_models:
         if model_name in available_models:
-            return model_name
+            chosen_model = model_name
+            break
 
-    # If none of our favorites matched, pick the first non-audio model from your account
-    for model_name in available_models:
-        if "whisper" not in model_name and "guard" not in model_name and "tts" not in model_name:
-            return model_name
+    messages_for_ai = [{"role": "system", "content": system_prompt}]
+    for past_message in chat_history:
+        messages_for_ai.append({
+            "role": past_message["role"],
+            "content": past_message["content"]
+        })
+    messages_for_ai.append({"role": "user", "content": user_question})
 
-    # If the account has no models enabled at all, tell us cleanly
-    raise ValueError(f"No chat models found on your Groq account. Available: {available_models}")
+    response = client.chat.completions.create(
+        model=chosen_model,
+        messages=messages_for_ai,
+        temperature=0.5,
+        # Why frequency_penalty? This stops small 8B models from repeating sentences in a loop!
+        frequency_penalty=0.5,
+        max_tokens=1200
+    )
+
+    return response.choices[0].message.content
 
 
-# 5. Main function that takes your question and gets the AI Mentor's answer
-def ask_meta_ads_mentor(user_question: str) -> str:
+# 6. Main Coordinator Function: Tries Gemini first, falls back to Groq automatically
+def ask_meta_ads_mentor(user_question: str, chat_history: list) -> str:
     try:
-        client = get_groq_client()
-        
-        # Automatically pick a working model from your Groq account
-        chosen_model = get_working_model(client)
+        system_prompt = build_full_system_prompt()
 
-        # Send both the System Prompt and your Question to Groq
-        response = client.chat.completions.create(
-            model=chosen_model,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_question}
-            ],
-            temperature=0.7
-        )
+        # Try Gemini first (if GEMINI_API_KEY is in .env)
+        gemini_reply = ask_gemini(system_prompt, user_question, chat_history)
+        if gemini_reply:
+            return gemini_reply
 
-        # Extract the text answer from Groq's response
-        ai_answer = response.choices[0].message.content
-        return ai_answer
+        # Otherwise, use Groq (with our new anti-repetition fix)
+        return ask_groq(system_prompt, user_question, chat_history)
 
     except Exception as error:
         return f"AI Error: {str(error)}"

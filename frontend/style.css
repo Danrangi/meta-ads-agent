@@ -1,11 +1,10 @@
-/* Remove default spacing added by browsers so we have full control over the layout */
+/* Remove default browser spacing */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Set a clean, light-gray background and an easy-to-read professional font */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background-color: #f7f9fc;
@@ -15,7 +14,6 @@ body {
     height: 100vh;
 }
 
-/* Keep the chat app centered and readable on wide monitors, but full-width on phones */
 .app-container {
     width: 100%;
     max-width: 800px;
@@ -27,25 +25,45 @@ body {
     border-right: 1px solid #e2e8f0;
 }
 
-/* Style the top header */
+/* Header aligns title on the left and New Chat button on the right */
 .app-header {
-    padding: 16px 20px;
+    padding: 14px 20px;
     border-bottom: 1px solid #e2e8f0;
     background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .app-header h1 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     color: #0f172a;
 }
 
 .app-header p {
     font-size: 0.85rem;
     color: #64748b;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
-/* Make the chat area take up all available middle space and allow scrolling */
+/* Clean outline button for resetting the chat */
+.new-chat-btn {
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.new-chat-btn:hover {
+    background-color: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Middle chat area */
 .chat-box {
     flex: 1;
     padding: 20px;
@@ -55,18 +73,15 @@ body {
     gap: 16px;
 }
 
-/* Basic style for all chat bubbles */
 .message {
     max-width: 85%;
     padding: 12px 16px;
     border-radius: 8px;
     line-height: 1.5;
     font-size: 0.95rem;
-    /* Why: Preserves paragraphs and line breaks sent by the AI so text isn't squished */
     white-space: pre-wrap;
 }
 
-/* AI messages go on the left with a soft light-gray background */
 .ai-message {
     align-self: flex-start;
     background-color: #f1f5f9;
@@ -74,23 +89,47 @@ body {
     border: 1px solid #e2e8f0;
 }
 
-/* Your messages go on the right with a Meta-blue background */
 .user-message {
     align-self: flex-end;
     background-color: #1877f2;
     color: #ffffff;
 }
 
-/* Style the bottom typing area */
-.input-area {
-    padding: 16px 20px;
+/* Row of quick-action pill buttons above the input box */
+.quick-actions {
+    padding: 10px 20px 0 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    background-color: #ffffff;
     border-top: 1px solid #e2e8f0;
+}
+
+.action-btn {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background-color: #e0f2fe;
+    border-color: #38bdf8;
+    color: #0369a1;
+}
+
+/* Bottom input area */
+.input-area {
+    padding: 12px 20px 16px 20px;
     display: flex;
     gap: 12px;
     background-color: #ffffff;
 }
 
-/* Make the text box fill the width and look clean */
 #user-input {
     flex: 1;
     padding: 10px 12px;
@@ -101,13 +140,11 @@ body {
     resize: none;
 }
 
-/* Highlight the text box border when you click inside to type */
 #user-input:focus {
     outline: none;
     border-color: #1877f2;
 }
 
-/* Style the Send button */
 #send-btn {
     background-color: #1877f2;
     color: #ffffff;
@@ -119,7 +156,6 @@ body {
     cursor: pointer;
 }
 
-/* Slightly darken the button when hovering over it with a mouse */
 #send-btn:hover {
     background-color: #166fe5;
 }

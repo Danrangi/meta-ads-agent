@@ -7,5 +7,8 @@ uvicorn==0.30.6
 # python-dotenv lets us hide our secret AI API keys in a .env file
 python-dotenv==1.0.1
 
-# Official Groq library (updated to a modern version so it works with the latest internet tools)
+# Official Groq library
 groq>=0.15.0
+
+# Standard Python tool for making clean internet requests (used for Google Gemini)
+requests==2.32.3

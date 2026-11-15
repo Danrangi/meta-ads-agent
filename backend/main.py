@@ -2,13 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Import our new AI Mentor function from our ai_mentor.py file
+# Import our AI Mentor function
 from backend.ai_mentor import ask_meta_ads_mentor
 
 # 1. Create our FastAPI application
 app = FastAPI(title="Meta Ads AI Mentor Backend")
 
-# 2. Setup CORS so our frontend HTML file is allowed to talk to this Python server
+# 2. Setup CORS so our frontend can talk to this backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,9 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 3. Define what an incoming request from the frontend must look like
+# 3. Define what an incoming request from the frontend looks like
+# Why we added 'history': This list holds the previous messages in the chat
+# so the AI can remember context when you ask follow-up questions.
 class ChatRequest(BaseModel):
     message: str
+    history: list = []
 
 
 # 4. Health Check Endpoint (GET /)
@@ -31,11 +34,10 @@ def check_server_status():
 # 5. Chat Endpoint (POST /chat)
 @app.post("/chat")
 def chat_with_mentor(request: ChatRequest):
-    # Grab the question you typed in the chat box
     user_message = request.message
+    chat_history = request.history
 
-    # Send your question to our Groq AI Mentor and get the expert response
-    ai_reply = ask_meta_ads_mentor(user_message)
+    # Send both the new question AND the conversation history to our AI Mentor
+    ai_reply = ask_meta_ads_mentor(user_message, chat_history)
 
-    # Send the AI's response back to the frontend chat screen
     return {"reply": ai_reply}
