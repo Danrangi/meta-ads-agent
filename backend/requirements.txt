@@ -10,5 +10,11 @@ python-dotenv==1.0.1
 # Official Groq library
 groq>=0.15.0
 
-# Standard Python tool for making clean internet requests (used for Google Gemini)
+# Standard Python tool for fetching web pages and APIs
 requests==2.32.3
+
+# Upgraded to the latest version so YouTube transcripts work without XML errors
+youtube-transcript-api>=1.0.3
+
+# BeautifulSoup lets Python extract clean article text from blog posts and Meta docs
+beautifulsoup4==4.12.3

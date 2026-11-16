@@ -10,23 +10,66 @@
 
     <div class="app-container">
         
-        <!-- Header with title on the left and a 'New Chat' button on the right -->
+        <!-- Top Header with Add Knowledge button and New Chat button -->
         <header class="app-header">
             <div>
                 <h1>Meta Ads AI Mentor</h1>
-                <p>Strategy, Copywriting, Targeting & Learning</p>
+                <p>Nigeria & Global Ads Strategy, Copy & RAG Brain</p>
             </div>
-            <button id="new-chat-btn" class="new-chat-btn">New Chat</button>
+            <div class="header-buttons">
+                <button id="toggle-kb-btn" class="kb-btn">📚 Add Knowledge</button>
+                <button id="new-chat-btn" class="new-chat-btn">New Chat</button>
+            </div>
         </header>
+
+        <!-- Collapsible Knowledge Base Upload Panel (Hidden until you click '📚 Add Knowledge') -->
+        <section id="kb-panel" class="kb-panel hidden">
+            <h3>Add Expert Knowledge to AI Brain (RAG)</h3>
+            <p class="kb-subtext">Upload once—saved permanently in your knowledge base.</p>
+
+            <div class="kb-form">
+                <!-- Choose between YouTube, Website/Blog URL, or Pasted Text -->
+                <select id="kb-type">
+                    <option value="youtube">🎥 YouTube Video Link</option>
+                    <option value="url">🌐 Blog Post / Meta Help URL</option>
+                    <option value="text">📝 Paste Course Notes / Text</option>
+                </select>
+
+                <!-- Give this lesson a clear title -->
+                <input 
+                    type="text" 
+                    id="kb-title" 
+                    placeholder="Title (e.g., How to Run Ads in Nigeria - Pro Tutorial)" 
+                />
+
+                <!-- Paste the URL or Text here -->
+                <textarea 
+                    id="kb-content" 
+                    rows="2" 
+                    placeholder="Paste the YouTube URL, Blog URL, or text notes here..."
+                ></textarea>
+
+                <button id="save-kb-btn" class="save-kb-btn">Save to Brain</button>
+                <p id="kb-status" class="kb-status"></p>
+            </div>
+
+            <!-- Shows what videos and articles are already saved -->
+            <div class="saved-sources-box">
+                <strong>Saved in Brain:</strong>
+                <ul id="saved-sources-list">
+                    <li>Loading saved sources...</li>
+                </ul>
+            </div>
+        </section>
 
         <!-- Chat history area -->
         <main id="chat-box" class="chat-box">
             <div class="message ai-message">
-                Hello! I am your Meta Ads AI Mentor. Click one of the quick tools below or ask me anything about your campaign!
+                Hello! Click <strong>📚 Add Knowledge</strong> at the top to feed me YouTube videos, Meta docs, or course notes—or use the quick buttons below to start planning your campaign!
             </div>
         </main>
 
-        <!-- Quick-Action Buttons so you don't have to type long prompts from scratch -->
+        <!-- Quick-Action Buttons -->
         <div class="quick-actions">
             <button class="action-btn" data-action="strategy">🗺️ Build Strategy</button>
             <button class="action-btn" data-action="copy">✍️ Write 3 Ad Copies</button>

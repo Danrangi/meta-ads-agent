@@ -1,18 +1,38 @@
-// 1. Backend URL
-const BACKEND_URL = 'http://127.0.0.1:8000/chat';
+// 1. Smart Backend URL Selector
+// Why: When you test on your own laptop, it uses 127.0.0.1:8000.
+// When you open your live Vercel link on your phone, it uses your live Render URL!
+const RENDER_BACKEND_URL = 'https://YOUR-RENDER-APP-NAME.onrender.com';
 
-// 2. Grab HTML elements from the page
+const isLocalComputer = (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.protocol === 'file:'
+);
+
+const API_BASE_URL = isLocalComputer ? 'http://127.0.0.1:8000' : RENDER_BACKEND_URL;
+
+// 2. Grab Chat HTML elements
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const newChatBtn = document.getElementById('new-chat-btn');
 const actionButtons = document.querySelectorAll('.action-btn');
 
-// 3. Conversation memory list
+// 3. Grab Knowledge Panel HTML elements
+const toggleKbBtn = document.getElementById('toggle-kb-btn');
+const kbPanel = document.getElementById('kb-panel');
+const kbType = document.getElementById('kb-type');
+const kbTitle = document.getElementById('kb-title');
+const kbContent = document.getElementById('kb-content');
+const saveKbBtn = document.getElementById('save-kb-btn');
+const kbStatus = document.getElementById('kb-status');
+const savedSourcesList = document.getElementById('saved-sources-list');
+
+// 4. Conversation memory list
 const chatHistory = [];
 
 
-// 4. Helper function to make AI text look clean and turn **text** into real Bold text
+// 5. Helper function to make AI text look clean and turn **text** into Bold text
 function formatTextForScreen(rawText) {
     let safeText = rawText
         .replace(/&/g, "&amp;")
@@ -27,7 +47,7 @@ function formatTextForScreen(rawText) {
 }
 
 
-// 5. Function to create a chat bubble and put it on the screen
+// 6. Function to create a chat bubble and put it on the screen
 function addMessageToScreen(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
@@ -45,7 +65,126 @@ function addMessageToScreen(text, sender) {
 }
 
 
-// 6. Function to fill the input box with Nigerian Meta Ads templates
+// 7. Toggle the Knowledge Upload Panel open or closed
+function toggleKnowledgePanel() {
+    kbPanel.classList.toggle('hidden');
+    if (!kbPanel.classList.contains('hidden')) {
+        loadSavedSources();
+    }
+}
+
+
+// 8. Delete a saved source by its title
+async function deleteSource(title) {
+    try {
+        await fetch(`${API_BASE_URL}/knowledge/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title })
+        });
+        loadSavedSources();
+    } catch (error) {
+        console.error('Could not delete source:', error);
+    }
+}
+
+
+// 9. Fetch and display the list of already-saved YouTube videos, blogs, and notes
+async function loadSavedSources() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/knowledge`);
+        const data = await response.json();
+
+        savedSourcesList.innerHTML = '';
+
+        if (!data.sources || data.sources.length === 0) {
+            savedSourcesList.innerHTML = '<li>No sources uploaded yet. Add your first YouTube video or article above!</li>';
+            return;
+        }
+
+        data.sources.forEach(function(source) {
+            const li = document.createElement('li');
+            li.style.marginBottom = '6px';
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = `${source.title} (${source.source_type} - ${source.chunks} chunks) `;
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = 'Delete';
+            delBtn.style.marginLeft = '8px';
+            delBtn.style.padding = '2px 6px';
+            delBtn.style.fontSize = '0.75rem';
+            delBtn.style.color = '#dc2626';
+            delBtn.style.border = '1px solid #fca5a5';
+            delBtn.style.borderRadius = '4px';
+            delBtn.style.background = '#fef2f2';
+            delBtn.style.cursor = 'pointer';
+
+            delBtn.addEventListener('click', function() {
+                deleteSource(source.title);
+            });
+
+            li.appendChild(textSpan);
+            li.appendChild(delBtn);
+            savedSourcesList.appendChild(li);
+        });
+    } catch (error) {
+        savedSourcesList.innerHTML = '<li>Could not load sources. Make sure backend is running.</li>';
+    }
+}
+
+
+// 10. Send a new YouTube link, Blog URL, or Text note to the Python RAG engine
+async function handleSaveKnowledge() {
+    const type = kbType.value;
+    const title = kbTitle.value.trim();
+    const content = kbContent.value.trim();
+
+    if (!title || !content) {
+        kbStatus.style.color = '#dc2626';
+        kbStatus.textContent = 'Please enter both a Title and a Link/Text!';
+        return;
+    }
+
+    saveKbBtn.disabled = true;
+    saveKbBtn.textContent = 'Saving...';
+    kbStatus.style.color = '#475569';
+    kbStatus.textContent = 'Extracting content and saving to RAG brain...';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/knowledge`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                source_type: type,
+                title: title,
+                content: content
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            kbStatus.style.color = '#059669';
+            kbStatus.textContent = '✅ ' + data.message;
+            kbTitle.value = '';
+            kbContent.value = '';
+            loadSavedSources();
+        } else {
+            kbStatus.style.color = '#dc2626';
+            kbStatus.textContent = '❌ Error: ' + (data.detail || 'Could not save knowledge.');
+        }
+    } catch (error) {
+        kbStatus.style.color = '#dc2626';
+        kbStatus.textContent = '❌ Could not connect to Python server.';
+    }
+
+    saveKbBtn.disabled = false;
+    saveKbBtn.textContent = 'Save to Brain';
+}
+
+
+// 11. Fill the input box with Nigerian Meta Ads templates
 function fillPromptTemplate(actionType) {
     if (actionType === 'strategy') {
         userInput.value = "Build a complete Meta Ads strategy for:\n- Business Type: [e.g., Fashion Brand / Dental Clinic]\n- Offer & Price: ₦[e.g., ₦35,000]\n- Location: [e.g., Lagos & Abuja]\n- Where do customers buy?: [WhatsApp / Instagram DM / Website]";
@@ -61,25 +200,23 @@ function fillPromptTemplate(actionType) {
 }
 
 
-// 7. Function to clear the chat and start fresh
+// 12. Clear the chat and start fresh
 function startNewChat() {
     chatHistory.length = 0;
     chatBox.innerHTML = '';
     addMessageToScreen(
-        "New chat started! Click one of the quick tools below or tell me about the Nigerian campaign you are working on.",
+        "New chat started! Click one of the quick tools below or ask me anything based on your uploaded knowledge.",
         "ai"
     );
 }
 
 
-// 8. Function that sends the user's message AND chat history to Python
+// 13. Send the user's message AND chat history to Python
 async function sendMessageToBackend(userText) {
     try {
-        const response = await fetch(BACKEND_URL, {
+        const response = await fetch(`${API_BASE_URL}/chat`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: userText,
                 history: chatHistory
@@ -91,12 +228,12 @@ async function sendMessageToBackend(userText) {
 
     } catch (error) {
         console.error('Error connecting to backend:', error);
-        return 'Error: Could not reach the Python backend. Make sure uvicorn is running on port 8000!';
+        return 'Error: Could not reach the Python backend. (Note: On Render free tier, the server may take 30 seconds to wake up on your first message!)';
     }
 }
 
 
-// 9. Main function that runs when you click Send or press Enter
+// 14. Main function when you click Send or press Enter
 async function handleSendMessage() {
     const text = userInput.value.trim();
 
@@ -122,9 +259,11 @@ async function handleSendMessage() {
 }
 
 
-// 10. Connect all buttons to their functions
+// 15. Connect all buttons to their functions
 sendBtn.addEventListener('click', handleSendMessage);
 newChatBtn.addEventListener('click', startNewChat);
+toggleKbBtn.addEventListener('click', toggleKnowledgePanel);
+saveKbBtn.addEventListener('click', handleSaveKnowledge);
 
 actionButtons.forEach(function(button) {
     button.addEventListener('click', function() {
