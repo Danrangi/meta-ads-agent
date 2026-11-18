@@ -1,7 +1,7 @@
 // 1. Smart Backend URL Selector
 // Why: When you test on your own laptop, it uses 127.0.0.1:8000.
 // When you open your live Vercel link on your phone, it uses your live Render URL!
-const RENDER_BACKEND_URL = 'https://meta-ads-agent-3uta.onrender.com/';
+const RENDER_BACKEND_URL = 'https://meta-ads-agent-3uta.onrender.com';
 
 const isLocalComputer = (
     window.location.hostname === 'localhost' ||
