@@ -1,4 +1,3 @@
-cat > README.md << 'EOF'
 # 🚀 Personal Meta Ads AI Mentor (Nigeria & Global RAG Edition)
 
 A full-stack AI Strategist, Copywriter, and Tutor built to help plan, write, target, and analyze **Meta (Facebook & Instagram) Ads**—specifically tailored for the **Nigerian market** (Naira ₦ budgets, WhatsApp & Instagram DM funnels, Lagos/Abuja targeting, buyer trust psychology) as well as global best practices.
@@ -106,4 +105,3 @@ Render's free servers go to sleep when inactive and reset their disk to whatever
 ### Frontend on Vercel.com (Free Project)
 - **Root Directory:** `frontend`
 - **Backend Connection:** Set `RENDER_BACKEND_URL` on Line 4 of `frontend/app.js` to your live `.onrender.com` URL (with no trailing slash).
-EOF
