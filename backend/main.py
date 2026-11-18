@@ -9,10 +9,8 @@ from backend.rag_engine import (
     delete_knowledge_source
 )
 
-# 1. Create our FastAPI application
 app = FastAPI(title="Meta Ads AI Mentor Backend")
 
-# 2. Setup CORS so our frontend can talk to this backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,7 +20,6 @@ app.add_middleware(
 )
 
 
-# 3. Define the shape of incoming requests
 class ChatRequest(BaseModel):
     message: str
     history: list = []
@@ -38,27 +35,23 @@ class DeleteKnowledgeRequest(BaseModel):
     title: str
 
 
-# 4. Health Check Endpoint (GET /)
 @app.get("/")
 def check_server_status():
     return {"status": "online", "message": "Meta Ads AI Backend is running!"}
 
 
-# 5. Chat Endpoint (POST /chat)
 @app.post("/chat")
 def chat_with_mentor(request: ChatRequest):
     ai_reply = ask_meta_ads_mentor(request.message, request.history)
     return {"reply": ai_reply}
 
 
-# 6. List Saved Knowledge Endpoint (GET /knowledge)
 @app.get("/knowledge")
 def get_knowledge_list():
     sources = list_saved_sources()
     return {"sources": sources}
 
 
-# 7. Add New Knowledge Endpoint (POST /knowledge)
 @app.post("/knowledge")
 def upload_knowledge(request: KnowledgeRequest):
     try:
@@ -75,7 +68,6 @@ def upload_knowledge(request: KnowledgeRequest):
         raise HTTPException(status_code=400, detail=str(error))
 
 
-# 8. Delete Knowledge Endpoint (POST /knowledge/delete)
 @app.post("/knowledge/delete")
 def remove_knowledge(request: DeleteKnowledgeRequest):
     removed_count = delete_knowledge_source(request.title)

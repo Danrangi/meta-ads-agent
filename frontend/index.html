@@ -10,7 +10,7 @@
 
     <div class="app-container">
         
-        <!-- Top Header with Add Knowledge button and New Chat button -->
+        
         <header class="app-header">
             <div>
                 <h1>Meta Ads AI Mentor</h1>
@@ -22,27 +22,26 @@
             </div>
         </header>
 
-        <!-- Collapsible Knowledge Base Upload Panel (Hidden until you click '📚 Add Knowledge') -->
         <section id="kb-panel" class="kb-panel hidden">
             <h3>Add Expert Knowledge to AI Brain (RAG)</h3>
             <p class="kb-subtext">Upload once—saved permanently in your knowledge base.</p>
 
             <div class="kb-form">
-                <!-- Choose between YouTube, Website/Blog URL, or Pasted Text -->
+                
                 <select id="kb-type">
                     <option value="youtube">🎥 YouTube Video Link</option>
                     <option value="url">🌐 Blog Post / Meta Help URL</option>
                     <option value="text">📝 Paste Course Notes / Text</option>
                 </select>
 
-                <!-- Give this lesson a clear title -->
+                
                 <input 
                     type="text" 
                     id="kb-title" 
                     placeholder="Title (e.g., How to Run Ads in Nigeria - Pro Tutorial)" 
                 />
 
-                <!-- Paste the URL or Text here -->
+                
                 <textarea 
                     id="kb-content" 
                     rows="2" 
@@ -53,7 +52,7 @@
                 <p id="kb-status" class="kb-status"></p>
             </div>
 
-            <!-- Shows what videos and articles are already saved -->
+            
             <div class="saved-sources-box">
                 <strong>Saved in Brain:</strong>
                 <ul id="saved-sources-list">
@@ -62,22 +61,20 @@
             </div>
         </section>
 
-        <!-- Chat history area -->
+        
         <main id="chat-box" class="chat-box">
             <div class="message ai-message">
-                Hello! Click <strong>📚 Add Knowledge</strong> at the top to feed me YouTube videos, Meta docs, or course notes—or use the quick buttons below to start planning your campaign!
+                Hello! Click <strong>Add Knowledge</strong> at the top to feed me YouTube videos, Meta docs, or course notes—or use the quick buttons below to start planning your campaign!
             </div>
         </main>
 
-        <!-- Quick-Action Buttons -->
         <div class="quick-actions">
-            <button class="action-btn" data-action="strategy">🗺️ Build Strategy</button>
-            <button class="action-btn" data-action="copy">✍️ Write 3 Ad Copies</button>
-            <button class="action-btn" data-action="targeting">🎯 Targeting & Budget</button>
-            <button class="action-btn" data-action="analyze">📊 Analyze My Metrics</button>
+            <button class="action-btn" data-action="strategy"> Build Strategy</button>
+            <button class="action-btn" data-action="copy"> Write 3 Ad Copies</button>
+            <button class="action-btn" data-action="targeting"> Targeting & Budget</button>
+            <button class="action-btn" data-action="analyze"> Analyze My Metrics</button>
         </div>
 
-        <!-- Bottom typing area -->
         <footer class="input-area">
             <textarea 
                 id="user-input" 

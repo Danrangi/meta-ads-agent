@@ -2,13 +2,11 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-# Import our RAG retrieval function
+
 from backend.rag_engine import retrieve_relevant_knowledge
 
-# 1. Load secret API keys from .env
 load_dotenv()
 
-# 2. Define the core instructions for our Nigerian & Global Meta Ads Mentor
 BASE_SYSTEM_PROMPT = """
 You are my personal Meta Ads (Facebook & Instagram) AI Strategist and Mentor.
 I am based in Nigeria and running Meta Ads primarily for the Nigerian market (unless I state otherwise).
@@ -21,10 +19,7 @@ Whenever you help me with ad strategy, ad copy, targeting, or campaign analysis,
 5. Always include a short section at the end called "**💡 Why This Works (Lesson):**" explaining the Meta Ads principle behind your advice in simple English.
 """
 
-
-# 3. Build the System Prompt dynamically using RAG (retrieving top 3 most relevant chunks)
 def build_rag_system_prompt(user_question: str) -> str:
-    # We grab the top 3 best matching chunks so we don't overwhelm the AI with raw transcript text
     relevant_chunks = retrieve_relevant_knowledge(user_question, top_k=3)
     
     if not relevant_chunks:
@@ -41,34 +36,25 @@ def build_rag_system_prompt(user_question: str) -> str:
     )
 
 
-# 4. Score each model by its intelligence/size so we ALWAYS pick the smartest brain first!
-# Why: Groq sends model lists in random order. Scoring guarantees we always pick 70B/120B/Llama-4
-# first, and NEVER pick tiny foreign test models like 'allam-2-7b'.
 def score_model_intelligence(model_name: str) -> int:
     name = model_name.lower()
 
-    # Tier 1: Massive & Latest Flagship Models (Highest Priority)
     if any(k in name for k in ["70b", "120b", "maverick", "llama-4", "kimi", "qwen3-32b", "gpt-oss"]):
         return 100
 
-    # Tier 2: Strong Mid-Size Reasoning/Chat Models
     if any(k in name for k in ["32b", "27b", "17b", "scout", "compound", "mixtral"]):
         return 80
 
-    # Tier 3: Fast Standard Chat Models (9B / 8B)
     if any(k in name for k in ["gemma2-9b", "8b"]):
         return 50
 
-    # Everything else gets lowest priority
     return 10
 
 
-# 5. Get a cleanly sorted list of valid chat models from Smartest to Smallest
 def get_ranked_chat_models(client) -> list:
     models_response = client.models.list()
     all_models = [model.id for model in models_response.data]
 
-    # Block audio models, safety-checkers, and the broken 'allam' model
     blocked_words = ["whisper", "guard", "tts", "orpheus", "playai", "embed", "allam", "vision"]
 
     valid_models = []
@@ -77,14 +63,12 @@ def get_ranked_chat_models(client) -> list:
         if not any(bad_word in name_lower for bad_word in blocked_words):
             valid_models.append(model_name)
 
-    # Sort alphabetically first (for consistency), then sort by Intelligence Score (highest first)
     valid_models.sort()
     valid_models.sort(key=score_model_intelligence, reverse=True)
 
     return valid_models
 
 
-# 6. Main function to ask Groq using our smartest model + RAG prompt
 def ask_meta_ads_mentor(user_question: str, chat_history: list) -> str:
     try:
         api_key = os.getenv("GROQ_API_KEY")

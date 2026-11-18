@@ -1,6 +1,3 @@
-// 1. Smart Backend URL Selector
-// Why: When you test on your own laptop, it uses 127.0.0.1:8000.
-// When you open your live Vercel link on your phone, it uses your live Render URL!
 const RENDER_BACKEND_URL = 'https://meta-ads-agent-3uta.onrender.com';
 
 const isLocalComputer = (
@@ -11,14 +8,12 @@ const isLocalComputer = (
 
 const API_BASE_URL = isLocalComputer ? 'http://127.0.0.1:8000' : RENDER_BACKEND_URL;
 
-// 2. Grab Chat HTML elements
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const newChatBtn = document.getElementById('new-chat-btn');
 const actionButtons = document.querySelectorAll('.action-btn');
 
-// 3. Grab Knowledge Panel HTML elements
 const toggleKbBtn = document.getElementById('toggle-kb-btn');
 const kbPanel = document.getElementById('kb-panel');
 const kbType = document.getElementById('kb-type');
@@ -28,11 +23,9 @@ const saveKbBtn = document.getElementById('save-kb-btn');
 const kbStatus = document.getElementById('kb-status');
 const savedSourcesList = document.getElementById('saved-sources-list');
 
-// 4. Conversation memory list
 const chatHistory = [];
 
 
-// 5. Helper function to make AI text look clean and turn **text** into Bold text
 function formatTextForScreen(rawText) {
     let safeText = rawText
         .replace(/&/g, "&amp;")
@@ -47,7 +40,6 @@ function formatTextForScreen(rawText) {
 }
 
 
-// 6. Function to create a chat bubble and put it on the screen
 function addMessageToScreen(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
@@ -65,7 +57,6 @@ function addMessageToScreen(text, sender) {
 }
 
 
-// 7. Toggle the Knowledge Upload Panel open or closed
 function toggleKnowledgePanel() {
     kbPanel.classList.toggle('hidden');
     if (!kbPanel.classList.contains('hidden')) {
@@ -74,7 +65,6 @@ function toggleKnowledgePanel() {
 }
 
 
-// 8. Delete a saved source by its title
 async function deleteSource(title) {
     try {
         await fetch(`${API_BASE_URL}/knowledge/delete`, {
@@ -89,7 +79,6 @@ async function deleteSource(title) {
 }
 
 
-// 9. Fetch and display the list of already-saved YouTube videos, blogs, and notes
 async function loadSavedSources() {
     try {
         const response = await fetch(`${API_BASE_URL}/knowledge`);
@@ -134,7 +123,6 @@ async function loadSavedSources() {
 }
 
 
-// 10. Send a new YouTube link, Blog URL, or Text note to the Python RAG engine
 async function handleSaveKnowledge() {
     const type = kbType.value;
     const title = kbTitle.value.trim();
@@ -184,7 +172,6 @@ async function handleSaveKnowledge() {
 }
 
 
-// 11. Fill the input box with Nigerian Meta Ads templates
 function fillPromptTemplate(actionType) {
     if (actionType === 'strategy') {
         userInput.value = "Build a complete Meta Ads strategy for:\n- Business Type: [e.g., Fashion Brand / Dental Clinic]\n- Offer & Price: ₦[e.g., ₦35,000]\n- Location: [e.g., Lagos & Abuja]\n- Where do customers buy?: [WhatsApp / Instagram DM / Website]";
@@ -200,7 +187,6 @@ function fillPromptTemplate(actionType) {
 }
 
 
-// 12. Clear the chat and start fresh
 function startNewChat() {
     chatHistory.length = 0;
     chatBox.innerHTML = '';
@@ -211,7 +197,6 @@ function startNewChat() {
 }
 
 
-// 13. Send the user's message AND chat history to Python
 async function sendMessageToBackend(userText) {
     try {
         const response = await fetch(`${API_BASE_URL}/chat`, {
@@ -233,7 +218,6 @@ async function sendMessageToBackend(userText) {
 }
 
 
-// 14. Main function when you click Send or press Enter
 async function handleSendMessage() {
     const text = userInput.value.trim();
 
@@ -259,7 +243,6 @@ async function handleSendMessage() {
 }
 
 
-// 15. Connect all buttons to their functions
 sendBtn.addEventListener('click', handleSendMessage);
 newChatBtn.addEventListener('click', startNewChat);
 toggleKbBtn.addEventListener('click', toggleKnowledgePanel);
